@@ -10,6 +10,8 @@ autoscratch ~/the_project_name/model_a/checkpoints/
 2. Moves the checkpoints folder into that folder
 3. Creates a symbolic link `~/project_name/model_a/checkpoints` to `/network/scratch/[u]/[username]/autoscratch/project_name/model_a/checkpoints`.
 
+
+Screenshot of the process:
 ![](screenshot.png)
 
 ## Setup
