@@ -50,6 +50,7 @@ def main(source: str, log_level: str = "INFO", dry: bool = False):
 	level = DEBUG_LEVELS[log_level]
 	logging.basicConfig(
 		level=level,
+		format="",
 	)
 
 	user_path = Path.home().relative_to("/home/mila")
@@ -94,7 +95,7 @@ def main(source: str, log_level: str = "INFO", dry: bool = False):
 		shutil.move(source, new)
 		LOGGER.info(f"Symlinking.")
 		source.symlink_to(new)
-
+		LOGGER.info(f"Success.")
 
 
 if __name__ == "__main__":
