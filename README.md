@@ -1,8 +1,6 @@
 
 # Autoscratch
-Copies the source directory or object to a directory called "autoscratch"
-in the scratch dir, imitating the dir structure in that dir.
-The script then creates a symlink in its place in its original position.
+Moves the target file or directory to the scratch in a subdirectory imitating its current position in $HOME, and then replaces it by a symlink.
 
 ## Example:
 ```bash  
