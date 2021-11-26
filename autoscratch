@@ -75,6 +75,12 @@ def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
 	for in_home in sources:
 		in_home = Path(in_home).resolve()
 		
+		if not is_subdir(Path.home(), in_home):
+			raise ValueError(
+				"Doesn't currently work when the file is not in $HOME."
+				"Could easily be made to."
+			)
+
 		if is_subdir(scratch, in_home):
 			raise ValueError(
 				"in_home is already in scratch:\n"

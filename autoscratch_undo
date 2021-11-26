@@ -63,6 +63,12 @@ def main(*in_home_paths: List[str], log_level: str = "INFO", dry: bool = False):
 		# Make sure in_home_paths exist and are symlinks
 		in_home = Path(in_home).absolute()
 		assert in_home.exists(), in_home
+		if not is_subdir(Path.home(), in_home):
+			raise ValueError(
+				"Currently only handling symlinks in $HOME. \n"
+				f"\"{in_home}\" is not."
+			)
+
 		if not os.path.islink(in_home):
 			LOGGER.info(f"Ignoring \"{in_home}\": Not a symlink.")
 			# We just ignore, not break. This allows using the wildcard.
@@ -87,6 +93,7 @@ def main(*in_home_paths: List[str], log_level: str = "INFO", dry: bool = False):
 		# are the same. This should always be true.	
 		rel_scratch = in_scratch.relative_to(autoscratch_dir)
 		rel_home = in_home.relative_to(Path.home())
+
 		assert rel_scratch == rel_home, (rel_scratch, rel_home)
 
 		if dry:
