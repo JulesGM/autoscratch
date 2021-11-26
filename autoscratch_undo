@@ -101,15 +101,15 @@ def main(*in_home_paths: List[str], log_level: str = "INFO", dry: bool = False):
 		else:
 			LOGGER.info(
 				"Working on:\n"
-				f"\t- in_scratch: {in_scratch}"
-				f"\t- in_home: {in_home}\n"
+				f"\t- in_scratch: {in_scratch}\n"
+				f"\t- in_home: {in_home}"
 			)
 			
 			LOGGER.info(f"Moving the symlink to a temporary loc.")
 			in_home_temp_sym = in_home.parent
 			in_home_temp_sym /= in_home.name + "_unscratch_temp"
 			shutil.move(in_home, in_home_temp_sym)
-			LOGGER.info("Moving the source object to its new path.")
+			LOGGER.info("Moving the target.")
 			shutil.move(str(in_scratch), str(in_home))
 			LOGGER.info(f"Removing the symlink.")
 			os.remove(in_home_temp_sym)
