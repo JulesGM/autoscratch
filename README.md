@@ -20,3 +20,7 @@ git clone git@github.com:JulesGM/autoscratch.git
 cd autoscratch
 pip install .
 ```
+
+
+# autoscratch_undo
+Just run `autoscratch_undo` on a symlink created by `autoscratch` to do the inverse operation.
