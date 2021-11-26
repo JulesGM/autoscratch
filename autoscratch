@@ -56,7 +56,7 @@ def main(source: str, log_level: str = "INFO", dry: bool = False):
 	user_path = Path.home().relative_to("/home/mila")
 	original_source = source
 	scratch = Path("/network/scratch/") / user_path
-	cache_dir = scratch / "autoscratcher"
+	cache_dir = scratch / "autoscratch"
 
 	assert scratch.exists(), (
 		"The scratch directory is bad somehow. "
