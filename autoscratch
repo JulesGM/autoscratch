@@ -23,8 +23,8 @@ DEBUG_LEVELS = {
 
 
 def is_subdir(pot_ancestor: Union[str, Path], maybe_subdir: Union[str, Path]) -> bool:
-	pot_ancestor = Path(pot_ancestor).resolve()
-	maybe_subdir = Path(maybe_subdir).resolve()
+	pot_ancestor = Path(pot_ancestor).absolute()
+	maybe_subdir = Path(maybe_subdir).absolute()
 	common_prefix = os.path.commonprefix([str(pot_ancestor), str(maybe_subdir)])
 	return pot_ancestor == common_prefix
 	
