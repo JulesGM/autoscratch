@@ -10,6 +10,7 @@ autoscratch ~/the_project_name/model_a/checkpoints/
 2. Moves the checkpoints folder into that folder
 3. Creates a symbolic link `~/project_name/model_a/checkpoints` to `/network/scratch/[u]/[username]/autoscratch/project_name/model_a/checkpoints`.
 
+Supports having multiple files as arguments, and the use of filename wildcards (implicitely through bash).
 
 Screenshot of the process:
 ![](screenshot.png)
@@ -24,3 +25,5 @@ pip install .
 
 # autoscratch_undo
 Just run `autoscratch_undo` on a symlink created by `autoscratch` to do the inverse operation.
+
+Also supports having multiple files as arguments, and the use of filename wildcards (implicitely through bash).
