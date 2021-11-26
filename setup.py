@@ -14,7 +14,7 @@ setup(
     license = "CC0",
     python_requires=">=3.6.0",
     long_description=(SCRIPT_DIR / "README.md").read_text(),
-    scripts=["autoscratch", "unautoscratch"],
+    scripts=["autoscratch", "autoscratch_undo"],
     install_requires=[
         mod_name.strip() for mod_name in 
 	(SCRIPT_DIR / "requirements.txt").read_text().strip().split("\n")
