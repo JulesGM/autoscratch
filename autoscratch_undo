@@ -73,10 +73,10 @@ def main(*in_home_paths: List[str], log_level: str = "INFO", dry: bool = False):
 		# it exists, and is in the autoscratch dir
 		in_scratch = in_home.resolve()
 		assert in_scratch.exists(), in_scratch
-		if not is_subdir(scratch, in_scratch):
+		if not is_subdir(autoscratch_dir, in_scratch):
 			LOGGER.info(
 				f"Ignoring \"{in_home}\". The target is not a "
-				f"symlink to the scratch: \"{in_scratch}\""
+				f"symlink to the autoscratch_dir: \"{in_scratch}\""
 			)
 			# We just ignore, not break. This allows using the wildcard.
 			# We may change our mind about this.
