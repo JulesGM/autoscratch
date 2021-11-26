@@ -24,7 +24,7 @@ DEBUG_LEVELS = {
 def is_subdir(pot_ancestor, maybe_subdir):
 	pot_ancestor = Path(pot_ancestor).resolve()
 	maybe_subdir = Path(maybe_subdir).resolve()
-	common_prefix = os.path.commonprefix([pot_ancestor, maybe_subdir])
+	common_prefix = os.path.commonprefix([str(pot_ancestor), str(maybe_subdir)])
 	return pot_ancestor == common_prefix
 	
 
@@ -92,7 +92,7 @@ def main(source: str, log_level: str = "INFO", dry: bool = False):
 			f"\t- source: {source}\n"
 			f"\t- new path: {new}"
 		)
-		shutil.move(source, new)
+		shutil.move(str(source), str(new))
 		LOGGER.info(f"Symlinking.")
 		source.symlink_to(new)
 		LOGGER.info(f"Success.")
