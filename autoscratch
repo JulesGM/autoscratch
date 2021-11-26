@@ -23,8 +23,8 @@ DEBUG_LEVELS = {
 
 
 def is_subdir(pot_ancestor: Union[str, Path], maybe_subdir: Union[str, Path]) -> bool:
-	pot_ancestor = Path(pot_ancestor).absolute()
-	maybe_subdir = Path(maybe_subdir).absolute()
+	pot_ancestor = Path(pot_ancestor).resolve()
+	maybe_subdir = Path(maybe_subdir).resolve()
 	common_prefix = os.path.commonprefix([str(pot_ancestor), str(maybe_subdir)])
 	return pot_ancestor == Path(common_prefix)
 	
@@ -77,10 +77,8 @@ def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
 		
 		if not is_subdir(Path.home(), in_home):
 			raise ValueError(
-				"Doesn't currently work when the file is not in $HOME. "
-				"Could easily be made to.\n"
-				f"{Path.home()}\n"
-				f"{in_home}\n"
+				"Doesn't currently work when the file is not in $HOME."
+				"Could easily be made to."
 			)
 
 		if is_subdir(scratch, in_home):
