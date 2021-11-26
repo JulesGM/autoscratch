@@ -31,19 +31,15 @@ def is_subdir(pot_ancestor, maybe_subdir):
 def main(source: str, log_level: str = "INFO", dry: bool = False):
 	"""
 	# Autoscratch
-	Copies the source directory or object to a directory called "autoscratch"
-	in the scratch dir, imitating the dir structure in that dir. 
-        The script then creates a symlink in its place in its original position.
+	Moves the target file or directory to the scratch in a subdirectory imitating its current position in $HOME, and then replaces it by a symlink.
 
 	## Example:
 	```
-	# We are in /home/mila/u/username/project_name/model_a/
-	autoscratch ./checkpoints/
-	# 1. Creates a folder at /network/scratch/u/username/autoscratcher/project_name/model_a/
-	# 2. Moves the checkpoints folder into that folder
-	# 3. Creates a symbolic link /home/mila/u/username/project_name/model_a/checkpoints
-	#    to /network/scratch/u/username/autoscratcher/project_name/model_a/checkpoints
+	autoscratch ~/the_project_name/model_a/checkpoints/
 	```
+	1. Creates a folder at `/network/scratch/[u]/[username]/autoscratcher/project_name/model_a/`
+	2. Moves the checkpoints folder into that folder
+	3. Creates a symbolic link `/home/mila/[u]/[username]/project_name/model_a/checkpoints` to `/network/scratch/[u]/[username]/autoscratcher/project_name/model_a/checkpoints`.
 
 	## Arguments:
 	source: Path of the file or directory to autoscratch
