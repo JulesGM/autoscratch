@@ -46,7 +46,7 @@ def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
 	   to `/network/scratch/[u]/[username]/autoscratcher/project_name/model_a/checkpoints`.
 
 	## Arguments:
-	source: Path of the file or directory to autoscratch
+	in_home: Path of the file or directory to autoscratch
 	log-level: string name of the common python logging levels to filter the logging
 	dry: whether or not to do a dry run.
 	"""	
@@ -57,51 +57,50 @@ def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
 		format="",
 	)
 
-	user_path = Path.home().relative_to("/home/mila")
-	scratch = Path("/network/scratch/") / user_path
-	cache_dir = scratch / "autoscratch"
+	user_path_segment = Path.home().relative_to("/home/mila")
+	scratch = Path("/network/scratch/") / user_path_segment
+	autoscratch_dir = scratch / "autoscratch"
 
 	assert scratch.exists(), (
 		"The scratch directory is bad somehow. "
 	 	f"Please file an issue. {scratch = }"
 	)
 
-	cache_dir.mkdir(exist_ok=True)
+	autoscratch_dir.mkdir(exist_ok=True)
 	LOGGER.debug(f"{sources = }")
-	LOGGER.debug(f"Autoscratcher {cache_dir = }")
+	LOGGER.debug(f"Autoscratch {autoscratch_dir = }")
 	
 	# Don't do anything if the target is already in the scratch folder
 
-	for source in sources:
-		if is_subdir(scratch, source):
-			raise ValueErrorf(
-				"Source is already in scratch:\n"
-				"\t- {original_source = }\n"
-				"\t- {source = }\n"
+	for in_home in sources:
+		in_home = Path(in_home).resolve()
+		
+		if is_subdir(scratch, in_home):
+			raise ValueError(
+				"in_home is already in scratch:\n"
+				"\t- {in_home = }\n"
 				"\t- {scratch = }"
 			)
 
-		original_source = source
-		source = Path(source).resolve()
-		rel = source.relative_to(Path.home())
-		new = cache_dir / rel
-		LOGGER.debug(f"{new = }")
-	
+		rel = in_home.relative_to(Path.home())			
+		in_scratch = autoscratch_dir / rel
+		LOGGER.debug(f"{in_scratch = }")
+
 		if dry:
 			LOGGER.info("Dry run.")
 		else:
 			LOGGER.info(
 				"Working on:\n"
-				f"\t- source: {source}\n"
-				f"\t- new path: {new}"
+				f"\t- in_home: {in_home}\n"
+				f"\t- in_scratch path: {in_scratch}"
 			)
-			LOGGER.debug(f"Creating the new path's parent.")
-			new.parent.mkdir(parents=True, exist_ok=True)
-			LOGGER.info("Moving the source object to its new path.")
-			shutil.move(str(source), str(new))
+			LOGGER.debug(f"Creating the in_scratch path's parent.")
+			in_scratch.parent.mkdir(parents=True, exist_ok=True)
+			LOGGER.info("Moving the in_home object to its in_scratch path.")
+			shutil.move(str(in_home), str(in_scratch))
 			LOGGER.info(f"Symlinking.")
-			source.symlink_to(new)
-			LOGGER.info(f"Success for `{source}`\n")
+			in_home.symlink_to(in_scratch)
+			LOGGER.info(f"Success for `{in_home}`\n")
 
 
 if __name__ == "__main__":

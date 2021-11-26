@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+import logging
+from pathlib import Path
+import os
+import shutil
+from typing import List, Union
+
+import fire
+try:
+	import colored_traceback.auto
+except ImportError:
+	pass
+
+
+LOGGER = logging.getLogger(__name__)
+DEBUG_LEVELS = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
+
+def is_subdir(
+		pot_ancestor: Union[str, Path], 
+		maybe_subdir: Union[str, Path]
+	) -> bool:
+
+	pot_ancestor = Path(pot_ancestor).resolve()
+	maybe_subdir = Path(maybe_subdir).resolve()
+	common_prefix = os.path.commonprefix([str(pot_ancestor), str(maybe_subdir)])
+	return pot_ancestor == common_prefix
+	
+
+def main(*in_home_paths: List[str], log_level: str = "INFO", dry: bool = False):
+	"""
+	Unscratches a previously autoscratched file. The in_home_paths need to be symbolic links.
+	This replaces the symbolic link with the targeted file.
+	"""	
+
+	level = DEBUG_LEVELS[log_level]
+	logging.basicConfig(
+		level=level,
+		format="",
+	)
+
+	# Build the general paths relating to the scratch
+	# and the autoscratch dir
+	user_path_segment = Path.home().relative_to("/home/mila")
+	scratch = Path("/network/scratch/") / user_path_segment
+	autoscratch_dir = scratch / "autoscratch"
+	assert scratch.exists(), (
+		"The scratch directory is bad somehow. "
+	 	f"Please file an issue. {scratch = }"
+	)
+	assert autoscratch_dir.exists(), autoscratch_dir
+	
+	
+	LOGGER.debug(f"{in_home_paths = }")
+	LOGGER.debug(f"Autoscratch path {autoscratch_dir = }")
+	for in_home in in_home_paths:
+		# Make sure in_home_paths exist and are symlinks
+		in_home = Path(in_home).absolute()
+		assert in_home.exists(), in_home
+		if not os.path.islink(in_home):
+			LOGGER.info(f"Ignoring \"{in_home}\": Not a symlink.")
+			# We just ignore, not break. This allows using the wildcard.
+			# We may change our mind about this.
+			continue
+
+		# Find the file referred to by the symlink, make sure
+		# it exists, and is in the autoscratch dir
+		in_scratch = in_home.resolve()
+		assert in_scratch.exists(), in_scratch
+		if not is_subdir(scratch, in_scratch):
+			LOGGER.info(
+				f"Ignoring \"{in_home}\". The target is not a "
+				f"symlink to the scratch: \"{in_scratch}\""
+			)
+			# We just ignore, not break. This allows using the wildcard.
+			# We may change our mind about this.
+			continue
+
+		# Ensure that the relative path between the in_scratch file
+		# and the autoscratch_dir and the in_home file and the $HOME
+		# are the same. This should always be true.	
+		rel_scratch = in_scratch.relative_to(autoscratch_dir)
+		rel_home = in_home.relative_to(Path.home())
+		assert rel_scratch == rel_home, (rel_scratch, rel_home)
+
+		if dry:
+			LOGGER.info("Dry run.")
+		else:
+			LOGGER.info(
+				"Working on:\n"
+				f"\t- in_scratch: {in_scratch}"
+				f"\t- in_home: {in_home}\n"
+			)
+			
+			LOGGER.info(f"Moving the symlink to a temporary loc.")
+			in_home_temp_sym = in_home
+			in_home_temp_sym.name += "_unscratch_temp"
+			shutil.move(in_home, in_home_temp_sym)
+			LOGGER.info("Moving the source object to its new path.")
+			shutil.move(str(in_scratch), str(in_home))
+			LOGGER.info(f"Removing the symlink.")
+			os.remove(in_home_temp_sym)
+
+
+if __name__ == "__main__":
+	fire.Fire(main)
