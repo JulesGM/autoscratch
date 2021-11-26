@@ -77,8 +77,10 @@ def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
 		
 		if not is_subdir(Path.home(), in_home):
 			raise ValueError(
-				"Doesn't currently work when the file is not in $HOME."
-				"Could easily be made to."
+				"Doesn't currently work when the file is not in $HOME. "
+				"Could easily be made to.\n"
+				f"{Path.home()}\n"
+				f"{in_home}\n"
 			)
 
 		if is_subdir(scratch, in_home):
