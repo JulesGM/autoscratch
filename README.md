@@ -1,5 +1,5 @@
 
-# Autoscratch
+# Autoscratch 🚀  ✏️ 
 Moves the target file or directory to the scratch in a subdirectory imitating its current position in $HOME, and then replaces it by a symlink.
 
 ## Example
@@ -9,6 +9,8 @@ autoscratch ~/the_project_name/model_a/checkpoints/
 1. Creates a folder at `/network/scratch/[u]/[username]/autoscratch/project_name/model_a/`
 2. Moves the checkpoints folder into that folder
 3. Creates a symbolic link `~/project_name/model_a/checkpoints` to `/network/scratch/[u]/[username]/autoscratch/project_name/model_a/checkpoints`.
+
+![](screenshot.png)
 
 ## Setup
 ```
