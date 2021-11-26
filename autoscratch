@@ -5,6 +5,10 @@ import os
 import shutil
 
 import fire
+try:
+	import colored_traceback.auto
+except ImportError:
+	pass
 
 
 LOGGER = logging.getLogger(__name__)
@@ -17,31 +21,82 @@ DEBUG_LEVELS = {
 }
 
 
-def main(source: str, log_level: str = "DEBUG", dry: bool = False):
+def is_subdir(pot_ancestor, maybe_subdir):
+	pot_ancestor = Path(pot_ancestor).resolve()
+	maybe_subdir = Path(maybe_subdir).resolve()
+	common_prefix = os.path.commonprefix([pot_ancestor, maybe_subdir])
+	return pot_ancestor == common_prefix
+	
+
+def main(source: str, log_level: str = "INFO", dry: bool = False):
+	"""
+	# Autoscratch
+	Copies the source directory or object to a directory called "autoscratch"
+	in the scratch dir, imitating the dir structure in that dir. 
+        The script then creates a symlink in its place in its original position.
+
+	## Example:
+	```
+	# We are in /home/mila/u/username/project_name/model_a/
+	autoscratch ./checkpoints/
+	# 1. Creates a folder at /network/scratch/u/username/autoscratcher/project_name/model_a/
+	# 2. Moves the checkpoints folder into that folder
+	# 3. Creates a symbolic link /home/mila/u/username/project_name/model_a/checkpoints
+	#    to /network/scratch/u/username/autoscratcher/project_name/model_a/checkpoints
+	```
+
+	## Arguments:
+	source: Path of the file or directory to autoscratch
+	log-level: string name of the common python logging levels to filter the logging
+	dry: whether or not to do a dry run.
+	"""	
+
 	level = DEBUG_LEVELS[log_level]
 	logging.basicConfig(
 		level=level,
 	)
 
-	cache_dir = Path("/network/scratch/g") / os.environ["USER"] / "autoscratcher"
-	assert cache_dir.parent.exists(), cache_dir.parent
+	user_path = Path.home().relative_to("/home/mila")
+	original_source = source
+	scratch = Path("/network/scratch/") / user_path
+	cache_dir = scratch / "autoscratcher"
+
+	assert scratch.exists(), (
+		"The scratch directory is bad somehow. "
+	 	f"Please file an issue. {scratch = }"
+	)
+
 	cache_dir.mkdir(exist_ok=True)
-
-	if dry:
-		LOGGER.info("Dry run.")
-
 	source = Path(source).resolve()
 	LOGGER.debug(f"{source = }")
-	home = Path.home()
-	rel = source.relative_to(home)
+	LOGGER.debug(f"Autoscratcher {cache_dir = }")
+	
+	rel = source.relative_to(Path.home())
+
+	# Don't do anything if the target is already in the scratch folder
+	if is_subdir(scratch, source):
+		raise ValueErrorf(
+			"Source is already in scratch:\n"
+			"\t- {original_source = }\n"
+			"\t- {source = }\n"
+			"\t- {scratch = }"
+		)
+	
 	new = cache_dir / rel
 	LOGGER.debug(f"{new = }")
-	LOGGER.debug(f"Creating the new path's parent.")
-	if not dry:
+	
+	if dry:
+		LOGGER.info("Dry run.")
+	else:
+		LOGGER.debug(f"Creating the new path's parent.")
 		new.parent.mkdir(parents=True, exist_ok=True)
-		LOGGER.debug(f"Moving the source to its new path.")
+		LOGGER.info(
+			"Moving the source object to its new path.\n"
+			f"\t- source: {source}\n"
+			f"\t- new path: {new}"
+		)
 		shutil.move(source, new)
-		LOGGER.debug(f"Symlinking {source = } to {new = }")
+		LOGGER.info(f"Symlinking.")
 		source.symlink_to(new)
 
 
