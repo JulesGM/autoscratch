@@ -26,7 +26,7 @@ def is_subdir(pot_ancestor: Union[str, Path], maybe_subdir: Union[str, Path]) ->
 	pot_ancestor = Path(pot_ancestor).absolute()
 	maybe_subdir = Path(maybe_subdir).absolute()
 	common_prefix = os.path.commonprefix([str(pot_ancestor), str(maybe_subdir)])
-	return pot_ancestor == common_prefix
+	return pot_ancestor == Path(common_prefix)
 	
 
 def main(*sources: List[str], log_level: str = "INFO", dry: bool = False):
